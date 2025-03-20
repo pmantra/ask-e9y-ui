@@ -3,44 +3,142 @@
 @tailwind components;
 @tailwind utilities;
 
-
 * {
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
-  min-height: 100vh;
-}
-
-.results-table-container {
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid #E2E8F0;
-  border-radius: 6px;
-}
-
-.results-table-container table {
-  width: max-content;
-  min-width: 100%;
-}
-
-/* Add to index.css */
-html {
   height: 100%;
   overflow: hidden;
-}
-
-body {
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  margin: 0;
-  padding: 0;
 }
 
 #root {
   height: 100%;
-  position: relative;
+}
+
+/* Chat message animations */
+@keyframes messageAppear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+/* Apply animations */
+.message-item {
+  animation: messageAppear 0.3s ease-out;
+}
+
+.loading-dot {
+  animation: pulse 1.5s infinite;
+}
+
+/* Results table styling */
+.results-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 6px;
+}
+
+.results-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.results-table-container th {
+  position: sticky;
+  top: 0;
+  background: #f7fafc;
+  z-index: 10;
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.results-table-container td {
+  padding: 8px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.results-table-container tr:hover td {
+  background-color: #f7fafc;
+}
+
+/* Markdown content styling */
+.markdown-content {
+  line-height: 1.6;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.markdown-content h3 {
+  font-size: 1.2em;
+  color: #2C5282; /* blue.700 */
+}
+
+.markdown-content p {
+  margin-bottom: 1em;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5em;
+}
+
+.markdown-content a {
+  color: #3182CE; /* blue.500 */
+  text-decoration: none;
+}
+
+.markdown-content a:hover {
+  text-decoration: underline;
+}
+
+.markdown-content code {
+  background-color: #EDF2F7; /* gray.100 */
+  padding: 0.2em 0.4em;
+  border-radius: 0.2em;
+  font-size: 0.9em;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid #CBD5E0; /* gray.300 */
+  padding-left: 1em;
+  margin-left: 0;
+  color: #4A5568; /* gray.600 */
 }

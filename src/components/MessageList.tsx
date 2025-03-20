@@ -1,5 +1,4 @@
-// src/components/MessageList.tsx
-import { VStack } from '@chakra-ui/react';
+import { VStack, Box, Divider } from '@chakra-ui/react';
 import MessageItem from './MessageItem';
 import { Message } from '../types';
 
@@ -10,11 +9,19 @@ interface MessageListProps {
 
 const MessageList = ({ messages, isLoading }: MessageListProps) => {
   return (
-    <VStack spacing={4} align="stretch">
-      {messages.map(message => (
-        <MessageItem key={message.id} message={message} />
+    <Box width="100%" overflowY="auto" px={2}>
+      {messages.map((message, index) => (
+        <Box key={message.id}>
+          <MessageItem message={message} />
+          {/* Add subtle divider between groups of messages, but not every message */}
+          {index < messages.length - 1 && 
+           messages[index].sender !== messages[index + 1].sender && (
+            <Divider my={2} borderColor="gray.100" />
+          )}
+        </Box>
       ))}
       
+      {/* Loading message at the end */}
       {isLoading && (
         <MessageItem 
           message={{
@@ -26,7 +33,7 @@ const MessageList = ({ messages, isLoading }: MessageListProps) => {
           }}
         />
       )}
-    </VStack>
+    </Box>
   );
 };
 

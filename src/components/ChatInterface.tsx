@@ -14,9 +14,10 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Button
+  Button,
+  Text
 } from '@chakra-ui/react';
-import { FiMenu, FiSave } from 'react-icons/fi';
+import { HamburgerIcon, StarIcon } from '@chakra-ui/icons';
 import { v4 as uuidv4 } from 'uuid';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
@@ -48,6 +49,7 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
   // =========== Refs and Hooks ===========
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   
   // =========== Expose Methods via Ref ===========
@@ -59,8 +61,15 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
   
   // =========== Effects ===========
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    scrollToBottom();
+  }, [messages, isLoading]);
+  
+  // Scroll to bottom function
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   
   // =========== Query Processing ===========
   const handleSendMessage = async (content: string) => {
@@ -102,6 +111,8 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
       conversation_id: conversationId,
       include_sql: true,
       max_results: 100,
+      include_explanation: true,       
+      include_cached_explanation: true
     });
     
     if (!conversationId && response.conversation_id) {
@@ -117,12 +128,16 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
       content: response.message || 'Here are the results of your query.',
       sender: 'system',
       timestamp: new Date(),
-      queryResults: response.query_details ? {
-        sql: response.query_details.generated_sql,
+      hasResults: response.has_results,
+      explanation: response.explanation,
+      timing_stats: response.timing_stats,
+      queryResults: {
+        sql: response.query_details?.generated_sql,
         results: response.results,
-        executionTimeMs: response.query_details.execution_time_ms,
-        rowCount: response.query_details.row_count
-      } : undefined
+        executionTimeMs: response.query_details?.execution_time_ms,
+        rowCount: response.query_details?.row_count,
+        query_details: response.query_details
+      }
     };
     
     setMessages(prev => [...prev, systemMessage]);
@@ -178,53 +193,70 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
   
   // =========== Render UI ===========
   return (
-    <Box 
-      borderWidth="1px" 
-      borderRadius="lg" 
-      overflow="hidden" 
-      bg="white"
-      boxShadow="sm"
-      display="flex"
-      flexDirection="column"
+    <Flex 
+      direction="column"
+      height="100vh"
+      width="100%"
+      overflow="hidden"
+      backgroundColor="white"
       position="relative"
-      height="96vh"
-      m={4}
     >
-      {/* Header Bar */}
+      {/* Header Bar with subtle design */}
       <Flex 
         p={3} 
         borderBottomWidth="1px" 
         borderColor="gray.200" 
         justify="space-between" 
         align="center"
+        bg="white"
+        boxShadow="sm"
       >
         <IconButton
           aria-label="Toggle Sidebar"
-          icon={<FiMenu />}
+          icon={<HamburgerIcon />}
           onClick={onToggleSidebar}
           variant="ghost"
+          size="md"
         />
+        
+        <Text fontSize="lg" fontWeight="medium" color="gray.700">
+          Ask E9Y
+        </Text>
         
         <IconButton
           aria-label="Save Query"
-          icon={<FiSave />}
+          icon={<StarIcon />}
           onClick={handleSaveQueryClick}
           isDisabled={!currentQuery}
           variant="ghost"
           colorScheme="blue"
+          size="md"
         />
       </Flex>
       
-      {/* Messages Area */}
-      <Box flex="1" overflowY="auto" p={4}>
-        <VStack spacing={4} align="stretch">
-          <MessageList messages={messages} isLoading={isLoading} />
-          <Box ref={messagesEndRef} />
-        </VStack>
+      {/* Main Chat Area */}
+      <Box 
+        ref={messagesContainerRef}
+        flex="1" 
+        overflowY="auto" 
+        py={4}
+        bg="gray.50"  // Subtle background color to distinguish from sidebar
+        position="relative"
+      >
+        <MessageList messages={messages} isLoading={isLoading} />
+        <Box ref={messagesEndRef} />
       </Box>
       
-      {/* Input Area */}
-      <MessageInput onSendMessage={handleSendMessage} isDisabled={isLoading} />
+      {/* Input Area with modern styling */}
+      <Box
+        borderTopWidth="1px"
+        borderColor="gray.200"
+        p={4}
+        bg="white"
+        width="100%"
+      >
+        <MessageInput onSendMessage={handleSendMessage} isDisabled={isLoading} />
+      </Box>
       
       {/* Save Query Dialog */}
       <AlertDialog
@@ -265,7 +297,7 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
-    </Box>
+    </Flex>
   );
 });
 

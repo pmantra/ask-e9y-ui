@@ -1,4 +1,3 @@
-// src/types.ts
 export interface Message {
     id: string;
     content: string;
@@ -6,14 +5,30 @@ export interface Message {
     timestamp: Date;
     isLoading?: boolean;
     isError?: boolean;
+    hasResults?: boolean;
+    explanation?: string;  // Add this field for explanations from query response
+    timing_stats?: {
+      cache_status?: string;
+      cache_lookup?: number;
+      sql_generation?: number;
+      sql_execution?: number;
+      total_time?: number;
+      [key: string]: any; // For other timing stats
+    };
     queryResults?: {
       sql?: string;
       results?: any[];
       executionTimeMs?: number;
       rowCount?: number;
+      query_details?: {
+        generated_sql?: string;
+        execution_time_ms?: number;
+        row_count?: number;
+      };
     };
   }
-
+  
+  // Other existing type definitions...
 export interface SavedQuery {
     id: string;
     name: string;
