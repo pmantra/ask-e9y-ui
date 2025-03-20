@@ -20,9 +20,17 @@ import {
   useClipboard,
   Button,
   Heading,
-  ListItem,
-  OrderedList,
-  UnorderedList
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
+  Input
 } from '@chakra-ui/react';
 import { 
   ChevronDownIcon, 
@@ -30,21 +38,21 @@ import {
   CopyIcon, 
   CheckIcon,
   InfoIcon, 
-  CloseIcon,
-  ViewIcon,
-  ViewOffIcon,
-  EditIcon,
-  RepeatIcon
+  CloseIcon
 } from '@chakra-ui/icons';
+import { FiBookmark } from 'react-icons/fi';
 import { Message } from '../types';
 import { getExplanation } from '../services/api';
+import { saveQuery } from '../services/storageService';
+import { v4 as uuidv4 } from 'uuid';
 import ReactMarkdown from 'react-markdown';
 
 interface MessageItemProps {
   message: Message;
+  onSaveQuery?: () => void; // Callback to refresh saved queries in parent
 }
 
-const MessageItem = ({ message }: MessageItemProps) => {
+const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
   // Handle case where message is undefined or null
   if (!message) {
     return null;
@@ -68,6 +76,10 @@ const MessageItem = ({ message }: MessageItemProps) => {
   const [explanationReady, setExplanationReady] = useState(!!initialExplanation);
   const { hasCopied, onCopy } = useClipboard(message.queryResults?.sql || '');
   
+  // State for save query functionality
+  const [queryName, setQueryName] = useState('');
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  
   // Reference to track if the component is mounted
   const isMounted = useRef(true);
   
@@ -86,6 +98,26 @@ const MessageItem = ({ message }: MessageItemProps) => {
     }
   }, [hasResults, message.id, explanation, isExplanationFetching, explanationFetchError]);
   
+  // Get the original user query that triggered this response
+  const getOriginalUserQuery = () => {
+    // If this is a system message with an original query, use that
+    if (message.original_user_query) {
+      return message.original_user_query;
+    }
+    // Otherwise fall back to the message content
+    return message.content;
+  };
+
+  // Initialize query name with the original user query when opening save dialog
+  useEffect(() => {
+    if (isOpen) {
+      const originalQuery = getOriginalUserQuery();
+      const truncatedQuery = originalQuery && originalQuery.length > 40 
+        ? originalQuery.substring(0, 40) + '...'
+        : originalQuery;
+      setQueryName(truncatedQuery || '');
+    }
+  }, [isOpen]);
 
   // Function to fetch explanation
   const fetchExplanation = async () => {
@@ -112,13 +144,39 @@ const MessageItem = ({ message }: MessageItemProps) => {
       setIsExplanationFetching(false);
     }
   };
-  
 
   // Handle showing/hiding explanation
   const toggleExplanation = () => {
     if (explanation) {
       setShowExplanation(!showExplanation);
     }
+  };
+
+  // Handle saving a query
+  const handleSaveQuery = () => {
+    if (!queryName.trim()) return;
+    
+    // Get the original user query that produced these results
+    const queryToSave = getOriginalUserQuery();
+    
+    // Create and save query object
+    const savedQuery = {
+      id: uuidv4(),
+      name: queryName.trim(),
+      query: queryToSave,
+      createdAt: new Date()
+    };
+    
+    saveQuery(savedQuery);
+    
+    // Call the callback to refresh saved queries in parent
+    if (onSaveQuery) {
+      onSaveQuery();
+    }
+    
+    // Close the modal and reset
+    onClose();
+    setQueryName('');
   };
 
   // Determine if this message should use the bubble style or full-width style
@@ -296,11 +354,25 @@ const MessageItem = ({ message }: MessageItemProps) => {
                     )}
                   </HStack>
                   <HStack>
+                    {/* Save Query Button - Only show for system messages with results */}
+                    {!isUser && hasResults && (
+                      <Tooltip label="Save Query">
+                        <IconButton
+                          aria-label="Save Query"
+                          icon={<FiBookmark />}
+                          size="sm"
+                          onClick={onOpen}
+                          variant="ghost"
+                          colorScheme="blue"
+                        />
+                      </Tooltip>
+                    )}
+                    
                     {/* SQL Button - Only show if SQL exists */}
                     {message.queryResults?.sql && (
                       <Button 
                         size="xs" 
-                        leftIcon={<EditIcon />} 
+                        leftIcon={<CopyIcon />} 
                         onClick={() => setShowSql(!showSql)}
                         colorScheme="gray"
                         variant={showSql ? "solid" : "ghost"}
@@ -337,10 +409,7 @@ const MessageItem = ({ message }: MessageItemProps) => {
                     position="relative"
                   >
                     <Flex justify="space-between" align="center" mb={2}>
-                      <HStack>
-                        <EditIcon color="gray.500" />
-                        <Text fontSize="sm" fontWeight="medium">Generated SQL</Text>
-                      </HStack>
+                      <Text fontSize="sm" fontWeight="medium">Generated SQL</Text>
                       <IconButton
                         aria-label="Copy SQL"
                         icon={hasCopied ? <CheckIcon /> : <CopyIcon />}
@@ -451,6 +520,42 @@ const MessageItem = ({ message }: MessageItemProps) => {
           </HStack>
         )}
       </Box>
+      
+      {/* Save Query Modal */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Save Query</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>Query Name</FormLabel>
+              <Input 
+                value={queryName}
+                onChange={(e) => setQueryName(e.target.value)}
+                placeholder="Enter a name for this query"
+                autoFocus
+              />
+            </FormControl>
+            <Text fontSize="sm" color="gray.600" mt={2}>
+              Saving: "{getOriginalUserQuery()?.substring(0, 60)}{getOriginalUserQuery() && getOriginalUserQuery().length > 60 ? '...' : ''}"
+            </Text>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button 
+              colorScheme="blue" 
+              onClick={handleSaveQuery}
+              isDisabled={!queryName.trim()}
+            >
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Flex>
   );
 };

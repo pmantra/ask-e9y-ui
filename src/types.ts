@@ -6,7 +6,8 @@ export interface Message {
     isLoading?: boolean;
     isError?: boolean;
     hasResults?: boolean;
-    explanation?: string;  // Add this field for explanations from query response
+    explanation?: string;
+    original_user_query?: string;  // Added this field to track the original query
     timing_stats?: {
       cache_status?: string;
       cache_lookup?: number;
@@ -29,7 +30,7 @@ export interface Message {
   }
   
   // Other existing type definitions...
-export interface SavedQuery {
+  export interface SavedQuery {
     id: string;
     name: string;
     query: string;

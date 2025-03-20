@@ -2,7 +2,7 @@ import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const app = express();
-const VITE_PORT = 5175;
+const VITE_PORT = 5176;
 const API_PORT = 8000;
 
 // Add middleware to set the cookie for all responses

@@ -4,25 +4,14 @@ import {
   Flex, 
   VStack, 
   IconButton, 
-  useDisclosure,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogContent,
-  AlertDialogOverlay,
-  FormControl,
-  FormLabel,
-  Input,
-  Button,
   Text
 } from '@chakra-ui/react';
-import { HamburgerIcon, StarIcon } from '@chakra-ui/icons';
+import { HamburgerIcon } from '@chakra-ui/icons';
 import { v4 as uuidv4 } from 'uuid';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import { Message, SavedQuery, QueryHistoryItem } from '../types';
-import { saveQuery, addQueryToHistory } from '../services/storageService';
+import { addQueryToHistory } from '../services/storageService';
 import { sendQuery } from '../services/api';
 
 interface ChatInterfaceProps {
@@ -44,13 +33,10 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
   const [isLoading, setIsLoading] = useState(false);
   const [currentQuery, setCurrentQuery] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | undefined>(undefined);
-  const [queryName, setQueryName] = useState('');
   
   // =========== Refs and Hooks ===========
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const cancelRef = useRef<HTMLButtonElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
   
   // =========== Expose Methods via Ref ===========
   useImperativeHandle(ref, () => ({
@@ -82,7 +68,7 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
     try {
       onQueryRun(content);
       const response = await processQuery(content);
-      addSystemMessage(response);
+      addSystemMessage(response, content); // Pass content directly to avoid state timing issues
       addToQueryHistory(content, response.query_id, true);
     } catch (error) {
       console.error("API Error:", error);
@@ -122,7 +108,7 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
     return response;
   };
   
-  const addSystemMessage = (response: any) => {
+  const addSystemMessage = (response: any, originalQuery: string) => {
     const systemMessage: Message = {
       id: response.query_id,
       content: response.message || 'Here are the results of your query.',
@@ -131,6 +117,7 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
       hasResults: response.has_results,
       explanation: response.explanation,
       timing_stats: response.timing_stats,
+      original_user_query: originalQuery, // Use the passed query directly
       queryResults: {
         sql: response.query_details?.generated_sql,
         results: response.results,
@@ -167,30 +154,6 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
     addQueryToHistory(historyItem);
   };
   
-  // =========== Save Query Handling ===========
-  const handleSaveQueryClick = () => {
-    if (currentQuery) {
-      setQueryName(currentQuery.slice(0, 30) + (currentQuery.length > 30 ? '...' : ''));
-      onOpen();
-    }
-  };
-  
-  const handleSaveQuery = () => {
-    if (currentQuery && queryName) {
-      const newSavedQuery: SavedQuery = {
-        id: uuidv4(),
-        name: queryName,
-        query: currentQuery,
-        createdAt: new Date()
-      };
-      
-      saveQuery(newSavedQuery);
-      onSaveQuery();
-      onClose();
-      setQueryName('');
-    }
-  };
-  
   // =========== Render UI ===========
   return (
     <Flex 
@@ -223,15 +186,8 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
           Ask E9Y
         </Text>
         
-        <IconButton
-          aria-label="Save Query"
-          icon={<StarIcon />}
-          onClick={handleSaveQueryClick}
-          isDisabled={!currentQuery}
-          variant="ghost"
-          colorScheme="blue"
-          size="md"
-        />
+        {/* Removed save button from header */}
+        <Box width="40px" /> {/* Spacer to maintain header layout */}
       </Flex>
       
       {/* Main Chat Area */}
@@ -243,7 +199,11 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
         bg="gray.50"  // Subtle background color to distinguish from sidebar
         position="relative"
       >
-        <MessageList messages={messages} isLoading={isLoading} />
+        <MessageList 
+          messages={messages} 
+          isLoading={isLoading} 
+          onSaveQuery={onSaveQuery} 
+        />
         <Box ref={messagesEndRef} />
       </Box>
       
@@ -257,46 +217,6 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
       >
         <MessageInput onSendMessage={handleSendMessage} isDisabled={isLoading} />
       </Box>
-      
-      {/* Save Query Dialog */}
-      <AlertDialog
-        isOpen={isOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={onClose}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Save Query
-            </AlertDialogHeader>
-
-            <AlertDialogBody>
-              <FormControl>
-                <FormLabel>Query Name</FormLabel>
-                <Input 
-                  value={queryName}
-                  onChange={(e) => setQueryName(e.target.value)}
-                  placeholder="Enter a name for this query"
-                />
-              </FormControl>
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button 
-                colorScheme="blue" 
-                onClick={handleSaveQuery} 
-                ml={3}
-                isDisabled={!queryName.trim()}
-              >
-                Save
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
     </Flex>
   );
 });
