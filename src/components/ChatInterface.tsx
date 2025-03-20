@@ -1,8 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
 import {
   Box, 
-  Flex, 
-  VStack, 
+  Flex,   
   IconButton, 
   Text
 } from '@chakra-ui/react';
@@ -10,7 +9,7 @@ import { HamburgerIcon } from '@chakra-ui/icons';
 import { v4 as uuidv4 } from 'uuid';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
-import { Message, SavedQuery, QueryHistoryItem } from '../types';
+import { Message, QueryHistoryItem } from '../types';
 import { addQueryToHistory } from '../services/storageService';
 import { sendQuery } from '../services/api';
 
@@ -31,7 +30,7 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentQuery, setCurrentQuery] = useState<string | null>(null);
+  const [, setCurrentQuery] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | undefined>(undefined);
   
   // =========== Refs and Hooks ===========

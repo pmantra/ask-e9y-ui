@@ -41,7 +41,7 @@ import {
   CloseIcon
 } from '@chakra-ui/icons';
 import { FiBookmark } from 'react-icons/fi';
-import { Message } from '../types';
+import { Message } from '../types/messageTypes';
 import { getExplanation } from '../services/api';
 import { saveQuery } from '../services/storageService';
 import { v4 as uuidv4 } from 'uuid';
@@ -65,9 +65,6 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
   
   // Check if explanation is already included with the message
   const initialExplanation = message.explanation || null;
-  
-  // State for collapsible sections
-  const [showSql, setShowSql] = useState(false);
   const [showResults, setShowResults] = useState(true);
   const [explanation, setExplanation] = useState<string | null>(initialExplanation);
   const [isExplanationFetching, setIsExplanationFetching] = useState(false);
