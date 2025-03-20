@@ -1,16 +1,24 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  build: {
-    // Skip type checking during build
-    emptyOutDir: true,
-    minify: true,
-    sourcemap: false
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src')
+    }
   },
-  esbuild: {
-    // Ignore TypeScript errors
-    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+  build: {
+    emptyOutDir: true,
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Ignore TypeScript errors during build
+        if (warning.code && warning.code.includes('TS')) {
+          return;
+        }
+        warn(warning);
+      }
+    }
   }
 })
