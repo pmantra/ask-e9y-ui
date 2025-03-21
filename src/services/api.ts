@@ -8,6 +8,8 @@ const api = axios.create({
   },
 });
 
+console.log("API URL:", config.API_URL);
+
 export interface QueryRequest {
   query: string;
   conversation_id?: string;
