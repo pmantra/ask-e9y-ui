@@ -72,6 +72,8 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
   const [showExplanation, setShowExplanation] = useState(false);
   const [explanationReady, setExplanationReady] = useState(!!initialExplanation);
   const { hasCopied, onCopy } = useClipboard(message.queryResults?.sql || '');
+  const [showSql, setShowSql] = useState<boolean>(false);
+
   
   // State for save query functionality
   const [queryName, setQueryName] = useState('');
@@ -587,7 +589,7 @@ const ResultsTable = ({ results }: { results: any[] }) => {
                 } else if (typeof value === 'string') {
                   displayValue = value;
                 } else if (typeof value === 'object') {
-                  if (value.hasOwnProperty('lower') || value.hasOwnProperty('upper')) {
+                  if (Object.prototype.hasOwnProperty.call(value, 'lower') || Object.prototype.hasOwnProperty.call(value, 'upper')) {
                     const lower = value.lower || '(unbounded)';
                     const upper = value.upper || '(unbounded)';
                     displayValue = `[${lower}, ${upper})`;

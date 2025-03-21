@@ -1,5 +1,7 @@
 // src/theme.ts
 import { extendTheme } from '@chakra-ui/react'
+import type { StyleFunctionProps } from '@chakra-ui/react';
+
 
 const colors = {
   brand: {
@@ -163,7 +165,7 @@ const theme = extendTheme({
         fontWeight: 'medium',
       },
       variants: {
-        subtle: props => ({
+        subtle: (props: StyleFunctionProps) => ({
           bg: `${props.colorScheme}.50`,
           color: `${props.colorScheme}.700`,
         }),

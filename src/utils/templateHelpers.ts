@@ -31,10 +31,13 @@ export const fillTemplate = (template: string, values: Record<string, string>): 
     filledTemplate = filledTemplate.replace(regex, value);
   });
   
-  // Replace any remaining placeholders with their default values or empty string
-  filledTemplate = filledTemplate.replace(/{([^{}:]+)(?::([^{}]*))?}/g, (_, placeholder, defaultValue) => {
-    return defaultValue || '';
-  });
+  filledTemplate = filledTemplate.replace(
+    /{([^{}:]+)(?::([^{}]*))?}/g,
+    (_match: string, _placeholder: string, defaultValue?: string): string => {
+      return defaultValue ?? '';
+    }
+  );
+  
   
   return filledTemplate;
 };
