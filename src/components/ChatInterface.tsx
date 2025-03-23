@@ -3,9 +3,12 @@ import {
   Box, 
   Flex,   
   IconButton, 
-  Text
+  Text,
+  Button
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
+import { FiBarChart2 } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
@@ -185,8 +188,17 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
           Ask E9Y
         </Text>
         
-        {/* Removed save button from header */}
-        <Box width="40px" /> {/* Spacer to maintain header layout */}
+        {/* Add Analysis button */}
+        <Button
+          as={Link}
+          to="/analysis"
+          leftIcon={<FiBarChart2 />}
+          variant="ghost"
+          colorScheme="blue"
+          size="sm"
+        >
+          Analysis
+        </Button>
       </Flex>
       
       {/* Main Chat Area */}

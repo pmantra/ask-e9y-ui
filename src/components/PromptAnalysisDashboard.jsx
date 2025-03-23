@@ -1,4 +1,3 @@
-// In PromptAnalysisDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { 
   Box, 
@@ -20,8 +19,11 @@ import {
   StatHelpText,
   StatArrow,
   SimpleGrid,
-  Divider
+  Divider,
+  IconButton
 } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
+import { FiHome } from 'react-icons/fi';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { diffLines } from 'diff';
 
@@ -189,259 +191,241 @@ const PromptAnalysisDashboard = () => {
   };
   
   return (
-    <Box p={5} overflowY="auto" maxHeight="100vh">
-      <Heading mb={5}>Prompt Analysis Dashboard</Heading>
+    <Box height="100vh" display="flex" flexDirection="column">
+      {/* Fixed Header with Back button */}
+      <Flex 
+        justify="space-between" 
+        align="center" 
+        p={4}
+        borderBottom="1px solid"
+        borderColor="gray.200"
+        bg="white"
+        width="100%"
+        position="sticky"
+        top={0}
+        zIndex={10}
+      >
+        <Heading size="lg" mb={0}>Prompt Analysis Dashboard</Heading>
+      </Flex>
       
-      <Tabs>
-        <TabList>
-          <Tab>Overview</Tab>
-          <Tab>Prompt Details</Tab>
-          <Tab>Comparison</Tab>
-        </TabList>
-        
-        <TabPanels>
-          {/* Overview panel */}
-          <TabPanel>
-            <Flex direction="column" gap={6}>
-              <Box>
-                <Heading size="md" mb={3}>Metrics Over Time</Heading>
-                <Box height="300px">
-                  <LineChart width={800} height={300} data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="queryId" />
-                    <YAxis yAxisId="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip />
-                    <Legend />
-                    <Line yAxisId="left" type="monotone" dataKey="schemaSize" stroke="#8884d8" name="Schema Size" />
-                    <Line yAxisId="left" type="monotone" dataKey="tableCount" stroke="#82ca9d" name="Table Count" />
-                    <Line yAxisId="right" type="monotone" dataKey="tokenCount" stroke="#ffc658" name="Token Count" />
-                  </LineChart>
-                </Box>
-              </Box>
-              
-              <Box>
-                <Heading size="md" mb={3}>Response Time vs Schema Size</Heading>
-                <Box height="300px">
-                  <LineChart width={800} height={300} data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="queryId" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="responseTime" stroke="#ff7300" name="Response Time (ms)" />
-                    <Line type="monotone" dataKey="schemaSize" stroke="#387908" name="Schema Size" />
-                  </LineChart>
-                </Box>
-              </Box>
-            </Flex>
-          </TabPanel>
+      {/* Scrollable content area */}
+      <Box 
+        overflowY="auto" 
+        flex="1" 
+        p={4}
+        position="relative"
+        css={{
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#888',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: '#555',
+          },
+        }}
+      >
+        <Tabs>
+          <TabList>
+            <Tab>Overview</Tab>
+            <Tab>Prompt Details</Tab>
+            <Tab>Comparison</Tab>
+          </TabList>
           
-          {/* Prompt details panel */}
-          <TabPanel>
-            {processedPrompts.length === 0 ? (
-              <Text>No prompts found. Run some queries first to see their details here.</Text>
-            ) : (
-              processedPrompts.map(prompt => (
-                <Box key={prompt.query_id} mb={8} p={4} borderWidth="1px" borderRadius="md">
-                  <Flex justify="space-between" align="flex-start">
-                    <Box>
-                      <Heading size="sm">{prompt.original_query}</Heading>
-                      <Text color="gray.500" fontSize="sm">ID: {prompt.query_id}</Text>
-                    </Box>
-                    <Flex gap={2}>
-                      <Badge colorScheme="blue">Tables: {prompt.analysis.schema_table_count}</Badge>
-                      <Badge colorScheme="green">Tokens: {prompt.analysis.estimated_tokens}</Badge>
-                      <Badge colorScheme="purple">Time: {prompt.execution_time_ms?.toFixed(2) || 0}ms</Badge>
-                    </Flex>
-                  </Flex>
-                  
-                  <Box mt={3}>
-                    <Heading size="xs" mb={2}>System Prompt</Heading>
-                    <Code p={2} borderRadius="md" fontSize="xs" whiteSpace="pre-wrap" maxHeight="200px" overflow="auto">
-                      {prompt.prompt_system}
-                    </Code>
+          <TabPanels>
+            {/* Overview panel */}
+            <TabPanel>
+              <Flex direction="column" gap={6}>
+                <Box>
+                  <Heading size="md" mb={3}>Metrics Over Time</Heading>
+                  <Box height="300px">
+                    <LineChart width={800} height={300} data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="queryId" />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip />
+                      <Legend />
+                      <Line yAxisId="left" type="monotone" dataKey="schemaSize" stroke="#8884d8" name="Schema Size" />
+                      <Line yAxisId="left" type="monotone" dataKey="tableCount" stroke="#82ca9d" name="Table Count" />
+                      <Line yAxisId="right" type="monotone" dataKey="tokenCount" stroke="#ffc658" name="Token Count" />
+                    </LineChart>
                   </Box>
                 </Box>
-              ))
-            )}
-          </TabPanel>
-          
-          {/* Comparison panel */}
-          <TabPanel>
-            <Box mb={6}>
-              <Heading size="md" mb={4}>Compare Prompts</Heading>
-              <Flex gap={4} mb={4}>
-                <Box flex="1">
-                  <Text mb={2}>First Prompt:</Text>
-                  <Select 
-                    placeholder="Select prompt..." 
-                    value={comparePrompt1}
-                    onChange={(e) => setComparePrompt1(e.target.value)}
-                  >
-                    {processedPrompts.map(p => (
-                      <option key={p.query_id} value={p.query_id}>
-                        {p.original_query?.substring(0, 30)}... ({p.query_id?.substring(0, 8)})
-                      </option>
-                    ))}
-                  </Select>
-                </Box>
                 
-                <Box flex="1">
-                  <Text mb={2}>Second Prompt:</Text>
-                  <Select 
-                    placeholder="Select prompt..." 
-                    value={comparePrompt2}
-                    onChange={(e) => setComparePrompt2(e.target.value)}
-                  >
-                    {processedPrompts.map(p => (
-                      <option key={p.query_id} value={p.query_id}>
-                        {p.original_query?.substring(0, 30)}... ({p.query_id?.substring(0, 8)})
-                      </option>
-                    ))}
-                  </Select>
+                <Box>
+                  <Heading size="md" mb={3}>Response Time vs Schema Size</Heading>
+                  <Box height="300px">
+                    <LineChart width={800} height={300} data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="queryId" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="responseTime" stroke="#ff7300" name="Response Time (ms)" />
+                      <Line type="monotone" dataKey="schemaSize" stroke="#387908" name="Schema Size" />
+                    </LineChart>
+                  </Box>
                 </Box>
               </Flex>
-              
-              <Button 
-                colorScheme="blue" 
-                onClick={generateComparison}
-                isDisabled={!comparePrompt1 || !comparePrompt2}
-              >
-                Compare Prompts
-              </Button>
-            </Box>
+            </TabPanel>
             
-            {comparison && (
-              <Box overflow="auto">
-                <Heading size="md" mb={4}>Comparison Results</Heading>
-                
-                {/* Metrics comparison */}
-                <SimpleGrid columns={3} spacing={10} mb={6}>
-                  <Stat>
-                    <StatLabel>Token Usage</StatLabel>
-                    <StatNumber>{comparison.prompt2.analysis.estimated_tokens}</StatNumber>
-                    <StatHelpText>
-                      {comparison.diffs.token.value !== 0 && (
-                        <>
-                          <StatArrow type={comparison.diffs.token.value < 0 ? 'decrease' : 'increase'} />
-                          {Math.abs(comparison.diffs.token.value)} ({comparison.diffs.token.percent}%)
-                        </>
-                      )}
-                    </StatHelpText>
-                  </Stat>
-                  
-                  <Stat>
-                    <StatLabel>Schema Tables</StatLabel>
-                    <StatNumber>{comparison.prompt2.analysis.schema_table_count}</StatNumber>
-                    <StatHelpText>
-                      {comparison.diffs.table.value !== 0 && (
-                        <>
-                          <StatArrow type={comparison.diffs.table.value < 0 ? 'decrease' : 'increase'} />
-                          {Math.abs(comparison.diffs.table.value)} ({comparison.diffs.table.percent}%)
-                        </>
-                      )}
-                    </StatHelpText>
-                  </Stat>
-                  
-                  <Stat>
-                    <StatLabel>Response Time</StatLabel>
-                    <StatNumber>{comparison.prompt2.execution_time_ms?.toFixed(2) || 0} ms</StatNumber>
-                    <StatHelpText>
-                      {parseFloat(comparison.diffs.time.value) !== 0 && (
-                        <>
-                          <StatArrow type={parseFloat(comparison.diffs.time.value) < 0 ? 'decrease' : 'increase'} />
-                          {Math.abs(comparison.diffs.time.value)} ms ({comparison.diffs.time.percent}%)
-                        </>
-                      )}
-                    </StatHelpText>
-                  </Stat>
-                </SimpleGrid>
-                
-                {/* Queries */}
-                <SimpleGrid columns={2} spacing={4} mb={6}>
-                  <Box>
-                    <Heading size="sm" mb={2}>First Query</Heading>
-                    <Text fontWeight="medium">{comparison.prompt1.original_query}</Text>
+            {/* Prompt details panel */}
+            <TabPanel>
+              {processedPrompts.length === 0 ? (
+                <Text>No prompts found. Run some queries first to see their details here.</Text>
+              ) : (
+                processedPrompts.map(prompt => (
+                  <Box key={prompt.query_id} mb={8} p={4} borderWidth="1px" borderRadius="md">
+                    <Flex justify="space-between" align="flex-start">
+                      <Box>
+                        <Heading size="sm">{prompt.original_query}</Heading>
+                        <Text color="gray.500" fontSize="sm">ID: {prompt.query_id}</Text>
+                      </Box>
+                      <Flex gap={2}>
+                        <Badge colorScheme="blue">Tables: {prompt.analysis.schema_table_count}</Badge>
+                        <Badge colorScheme="green">Tokens: {prompt.analysis.estimated_tokens}</Badge>
+                        <Badge colorScheme="purple">Time: {prompt.execution_time_ms?.toFixed(2) || 0}ms</Badge>
+                      </Flex>
+                    </Flex>
+                    
+                    <Box mt={3}>
+                      <Heading size="xs" mb={2}>System Prompt</Heading>
+                      <Code p={2} borderRadius="md" fontSize="xs" whiteSpace="pre-wrap" maxHeight="200px" overflow="auto">
+                        {prompt.prompt_system}
+                      </Code>
+                    </Box>
                   </Box>
-                  <Box>
-                    <Heading size="sm" mb={2}>Second Query</Heading>
-                    <Text fontWeight="medium">{comparison.prompt2.original_query}</Text>
+                ))
+              )}
+            </TabPanel>
+            
+            {/* Comparison panel */}
+            <TabPanel>
+              <Box mb={6}>
+                <Heading size="md" mb={4}>Compare Prompts</Heading>
+                <Flex gap={4} mb={4}>
+                  <Box flex="1">
+                    <Text mb={2}>First Prompt:</Text>
+                    <Select 
+                      placeholder="Select prompt..." 
+                      value={comparePrompt1}
+                      onChange={(e) => setComparePrompt1(e.target.value)}
+                    >
+                      {processedPrompts.map(p => (
+                        <option key={p.query_id} value={p.query_id}>
+                          {p.original_query?.substring(0, 30)}... ({p.query_id?.substring(0, 8)})
+                        </option>
+                      ))}
+                    </Select>
                   </Box>
-                </SimpleGrid>
-                
-                {/* Diff summary */}
-                {diffSummary && (
-                  <Flex mt={2} mb={4} justify="center">
-                    <Badge colorScheme="red" mx={2}>
-                      {diffSummary.removed} sections removed
-                    </Badge>
-                    <Badge colorScheme="green" mx={2}>
-                      {diffSummary.added} sections added
-                    </Badge>
-                    <Badge colorScheme="blue" mx={2}>
-                      {diffSummary.unchanged} sections unchanged
-                    </Badge>
-                  </Flex>
-                )}
-                
-                <Divider my={6} />
-                
-                {/* Show/Hide button */}
-                <Flex justify="center" mb={4}>
-                  <Button
-                    onClick={toggleExpandedView}
-                    colorScheme="blue"
-                    variant="outline"
-                    size="sm"
-                  >
-                    {expandedView ? "Show Less" : "Show Full Prompts"}
-                  </Button>
+                  
+                  <Box flex="1">
+                    <Text mb={2}>Second Prompt:</Text>
+                    <Select 
+                      placeholder="Select prompt..." 
+                      value={comparePrompt2}
+                      onChange={(e) => setComparePrompt2(e.target.value)}
+                    >
+                      {processedPrompts.map(p => (
+                        <option key={p.query_id} value={p.query_id}>
+                          {p.original_query?.substring(0, 30)}... ({p.query_id?.substring(0, 8)})
+                        </option>
+                      ))}
+                    </Select>
+                  </Box>
                 </Flex>
                 
-                {/* Prompt comparison with diff highlighting */}
-                <Heading size="sm" mb={4}>System Prompts</Heading>
-                <SimpleGrid columns={2} spacing={4} mb={6}>
-                  <Box>
-                    <Badge colorScheme="blue" mb={2}>First Prompt</Badge>
-                    <Box 
-                      p={2} 
-                      borderRadius="md" 
-                      fontSize="xs" 
-                      fontFamily="monospace"
-                      whiteSpace="pre-wrap" 
-                      height={expandedView ? "auto" : "400px"}
-                      maxHeight={expandedView ? "none" : "400px"}
-                      overflow="auto"
-                      bg="gray.50"
-                      border="1px solid"
-                      borderColor="gray.200"
-                    >
-                      {comparison.promptDiff.text1}
+                <Button 
+                  colorScheme="blue" 
+                  onClick={generateComparison}
+                  isDisabled={!comparePrompt1 || !comparePrompt2}
+                >
+                  Compare Prompts
+                </Button>
+              </Box>
+              
+              {comparison && (
+                <Box>
+                  <Heading size="md" mb={4}>Comparison Results</Heading>
+                  
+                  {/* Metrics comparison */}
+                  <SimpleGrid columns={3} spacing={10} mb={6}>
+                    <Stat>
+                      <StatLabel>Token Usage</StatLabel>
+                      <StatNumber>{comparison.prompt2.analysis.estimated_tokens}</StatNumber>
+                      <StatHelpText>
+                        {comparison.diffs.token.value !== 0 && (
+                          <>
+                            <StatArrow type={comparison.diffs.token.value < 0 ? 'decrease' : 'increase'} />
+                            {Math.abs(comparison.diffs.token.value)} ({comparison.diffs.token.percent}%)
+                          </>
+                        )}
+                      </StatHelpText>
+                    </Stat>
+                    
+                    <Stat>
+                      <StatLabel>Schema Tables</StatLabel>
+                      <StatNumber>{comparison.prompt2.analysis.schema_table_count}</StatNumber>
+                      <StatHelpText>
+                        {comparison.diffs.table.value !== 0 && (
+                          <>
+                            <StatArrow type={comparison.diffs.table.value < 0 ? 'decrease' : 'increase'} />
+                            {Math.abs(comparison.diffs.table.value)} ({comparison.diffs.table.percent}%)
+                          </>
+                        )}
+                      </StatHelpText>
+                    </Stat>
+                    
+                    <Stat>
+                      <StatLabel>Response Time</StatLabel>
+                      <StatNumber>{comparison.prompt2.execution_time_ms?.toFixed(2) || 0} ms</StatNumber>
+                      <StatHelpText>
+                        {parseFloat(comparison.diffs.time.value) !== 0 && (
+                          <>
+                            <StatArrow type={parseFloat(comparison.diffs.time.value) < 0 ? 'decrease' : 'increase'} />
+                            {Math.abs(comparison.diffs.time.value)} ms ({comparison.diffs.time.percent}%)
+                          </>
+                        )}
+                      </StatHelpText>
+                    </Stat>
+                  </SimpleGrid>
+                  
+                  {/* Queries */}
+                  <SimpleGrid columns={2} spacing={4} mb={6}>
+                    <Box>
+                      <Heading size="sm" mb={2}>First Query</Heading>
+                      <Text fontWeight="medium">{comparison.prompt1.original_query}</Text>
                     </Box>
-                  </Box>
-                  <Box>
-                    <Badge colorScheme="green" mb={2}>Second Prompt</Badge>
-                    <Box 
-                      p={2} 
-                      borderRadius="md" 
-                      fontSize="xs" 
-                      fontFamily="monospace"
-                      whiteSpace="pre-wrap" 
-                      height={expandedView ? "auto" : "400px"}
-                      maxHeight={expandedView ? "none" : "400px"}
-                      overflow="auto"
-                      bg="gray.50"
-                      border="1px solid"
-                      borderColor="gray.200"
-                    >
-                      {comparison.promptDiff.text2}
+                    <Box>
+                      <Heading size="sm" mb={2}>Second Query</Heading>
+                      <Text fontWeight="medium">{comparison.prompt2.original_query}</Text>
                     </Box>
-                  </Box>
-                </SimpleGrid>
-                
-                {/* Additional Show/Hide button at bottom for convenience */}
-                {expandedView && (
+                  </SimpleGrid>
+                  
+                  {/* Diff summary */}
+                  {diffSummary && (
+                    <Flex mt={2} mb={4} justify="center">
+                      <Badge colorScheme="red" mx={2}>
+                        {diffSummary.removed} sections removed
+                      </Badge>
+                      <Badge colorScheme="green" mx={2}>
+                        {diffSummary.added} sections added
+                      </Badge>
+                      <Badge colorScheme="blue" mx={2}>
+                        {diffSummary.unchanged} sections unchanged
+                      </Badge>
+                    </Flex>
+                  )}
+                  
+                  <Divider my={6} />
+                  
+                  {/* Show/Hide button */}
                   <Flex justify="center" mb={4}>
                     <Button
                       onClick={toggleExpandedView}
@@ -449,15 +433,72 @@ const PromptAnalysisDashboard = () => {
                       variant="outline"
                       size="sm"
                     >
-                      Show Less
+                      {expandedView ? "Show Less" : "Show Full Prompts"}
                     </Button>
                   </Flex>
-                )}
-              </Box>
-            )}
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+                  
+                  {/* Prompt comparison with diff highlighting */}
+                  <Heading size="sm" mb={4}>System Prompts</Heading>
+                  <SimpleGrid columns={2} spacing={4} mb={expandedView ? 16 : 6}>
+                    <Box>
+                      <Badge colorScheme="blue" mb={2}>First Prompt</Badge>
+                      <Box 
+                        p={2} 
+                        borderRadius="md" 
+                        fontSize="xs" 
+                        fontFamily="monospace"
+                        whiteSpace="pre-wrap" 
+                        height={expandedView ? "auto" : "400px"}
+                        maxHeight={expandedView ? "none" : "400px"}
+                        overflow="auto"
+                        bg="gray.50"
+                        border="1px solid"
+                        borderColor="gray.200"
+                        mb={2}
+                      >
+                        {comparison.promptDiff.text1}
+                      </Box>
+                    </Box>
+                    <Box>
+                      <Badge colorScheme="green" mb={2}>Second Prompt</Badge>
+                      <Box 
+                        p={2} 
+                        borderRadius="md" 
+                        fontSize="xs" 
+                        fontFamily="monospace"
+                        whiteSpace="pre-wrap" 
+                        height={expandedView ? "auto" : "400px"}
+                        maxHeight={expandedView ? "none" : "400px"}
+                        overflow="auto"
+                        bg="gray.50"
+                        border="1px solid"
+                        borderColor="gray.200"
+                        mb={2}
+                      >
+                        {comparison.promptDiff.text2}
+                      </Box>
+                    </Box>
+                  </SimpleGrid>
+                  
+                  {/* Additional Show/Hide button at bottom for convenience */}
+                  {expandedView && (
+                    <Flex justify="center" mb={16} pb={8}>
+                      <Button
+                        onClick={toggleExpandedView}
+                        colorScheme="blue"
+                        variant="outline"
+                        size="sm"
+                      >
+                        Show Less
+                      </Button>
+                    </Flex>
+                  )}
+                </Box>
+              )}
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </Box>
     </Box>
   );
 };

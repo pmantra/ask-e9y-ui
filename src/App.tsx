@@ -1,10 +1,10 @@
-// src/App.tsx
 import { useState, useEffect, useRef } from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import ChatInterface from './components/ChatInterface';
 import Sidebar from './components/Sidebar';
 import PromptAnalysisDashboard from './components/PromptAnalysisDashboard';
+import Layout from './components/layout/Layout';  // Import the new Layout component
 import { getSavedQueries, getQueryHistory } from './services/storageService';
 import { SavedQuery, QueryHistoryItem } from './types';
 
@@ -78,10 +78,12 @@ function App() {
   );
 
   return (
-    <Routes>
-      <Route path="/" element={renderMainInterface()} />
-      <Route path="/analysis" element={<PromptAnalysisDashboard />} />
-    </Routes>
+    <Layout>
+      <Routes>
+        <Route path="/" element={renderMainInterface()} />
+        <Route path="/analysis" element={<PromptAnalysisDashboard />} />
+      </Routes>
+    </Layout>
   );
 }
 
