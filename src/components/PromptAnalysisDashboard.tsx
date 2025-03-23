@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import { 
   Box, 
   Heading, 
@@ -25,30 +25,94 @@ import {
 import { Link } from 'react-router-dom';
 import { FiHome } from 'react-icons/fi';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { diffLines } from 'diff';
+import { diffLines, Change } from 'diff';
+
+// Define types for the prompt data
+interface PromptData {
+  query_id: string;
+  original_query: string;
+  prompt_system: string;
+  prompt_user: string;
+  execution_time_ms?: number;
+  schema_size?: number;
+  token_usage?: Record<string, number>;
+}
+
+// Define types for processed prompt data with analysis
+interface ProcessedPromptData extends PromptData {
+  analysis: {
+    estimated_tokens: number;
+    schema_table_count: number;
+  };
+}
+
+// Define types for chart data
+interface ChartDataPoint {
+  queryId: string;
+  schemaSize: number;
+  tokenCount: number;
+  responseTime: number;
+  tableCount: number;
+}
+
+// Define types for comparison data
+interface ComparisonData {
+  prompt1: ProcessedPromptData;
+  prompt2: ProcessedPromptData;
+  diffs: {
+    token: {
+      value: number;
+      percent: string;
+    };
+    table: {
+      value: number;
+      percent: string;
+    };
+    time: {
+      value: string;
+      percent: string;
+    };
+  };
+  promptDiff: {
+    text1: ReactNode;
+    text2: ReactNode;
+    diffs: Change[];
+  };
+}
+
+// Define type for diff summary
+interface DiffSummary {
+  removed: number;
+  added: number;
+  unchanged: number;
+}
 
 // Helper function to estimate token count
-const estimateTokens = (text) => {
+const estimateTokens = (text: string | undefined): number => {
   return text ? Math.ceil(text.length / 4) : 0; // Rough estimate: ~4 chars per token
 };
 
 // Helper to count tables in schema
-const countTables = (schemaText) => {
+const countTables = (schemaText: string | undefined): number => {
   if (!schemaText) return 0;
   const matches = schemaText.match(/Table: eligibility\./g);
   return matches ? matches.length : 0;
 };
 
 // Enhanced helper function to highlight differences
-const highlightDifferences = (text1, text2) => {
-  if (!text1 || !text2) return { text1, text2 };
+const highlightDifferences = (text1: string | undefined, text2: string | undefined): {
+  text1: ReactNode;
+  text2: ReactNode;
+  diffs: Change[];
+} => {
+  if (!text1 || !text2) return { text1, text2, diffs: [] };
   
   // Use line-by-line diff for large text like prompts
   const diffs = diffLines(text1, text2);
   
   // Create React elements with proper highlighting
-  const parts1 = [];
-  const parts2 = [];
+  const parts1: JSX.Element[] = [];
+  const parts2: JSX.Element[] = [];
   
   diffs.forEach((part, index) => {
     // Style for different parts
@@ -73,21 +137,21 @@ const highlightDifferences = (text1, text2) => {
   return { 
     text1: <>{parts1}</>, 
     text2: <>{parts2}</>,
-    diffs: diffs
+    diffs
   };
 };
 
-const PromptAnalysisDashboard = () => {
-  const [recentPrompts, setRecentPrompts] = useState([]);
-  const [loading, setLoading] = useState(true);
+const PromptAnalysisDashboard: React.FC = () => {
+  const [recentPrompts, setRecentPrompts] = useState<PromptData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   
   // State for comparison feature
-  const [comparePrompt1, setComparePrompt1] = useState('');
-  const [comparePrompt2, setComparePrompt2] = useState('');
-  const [comparison, setComparison] = useState(null);
+  const [comparePrompt1, setComparePrompt1] = useState<string>('');
+  const [comparePrompt2, setComparePrompt2] = useState<string>('');
+  const [comparison, setComparison] = useState<ComparisonData | null>(null);
   
   // State for expanding prompt display
-  const [expandedView, setExpandedView] = useState(false);
+  const [expandedView, setExpandedView] = useState<boolean>(false);
   
   useEffect(() => {
     // Fetch recent prompts
@@ -104,7 +168,7 @@ const PromptAnalysisDashboard = () => {
   }, []);
   
   // Process prompts for analysis (add token estimation, etc.)
-  const processedPrompts = recentPrompts.map(prompt => ({
+  const processedPrompts: ProcessedPromptData[] = recentPrompts.map(prompt => ({
     ...prompt,
     analysis: {
       estimated_tokens: estimateTokens(prompt.prompt_system) + estimateTokens(prompt.prompt_user),
@@ -113,7 +177,7 @@ const PromptAnalysisDashboard = () => {
   }));
   
   // Extract data for charts
-  const chartData = processedPrompts.map(p => ({
+  const chartData: ChartDataPoint[] = processedPrompts.map(p => ({
     queryId: p.query_id?.slice(0, 8) || 'unknown',
     schemaSize: p.schema_size || 0,
     tokenCount: p.analysis.estimated_tokens || 0,
@@ -122,7 +186,7 @@ const PromptAnalysisDashboard = () => {
   })).reverse(); // Reverse to show chronological order
   
   // Handle comparison generation
-  const generateComparison = () => {
+  const generateComparison = (): void => {
     if (!comparePrompt1 || !comparePrompt2) return;
     
     const prompt1 = processedPrompts.find(p => p.query_id === comparePrompt1);
@@ -171,7 +235,7 @@ const PromptAnalysisDashboard = () => {
   };
   
   // Calculate diff summary stats if comparison exists
-  const getDiffSummary = () => {
+  const getDiffSummary = (): DiffSummary | null => {
     if (!comparison || !comparison.promptDiff.diffs) return null;
     
     const diffs = comparison.promptDiff.diffs;
@@ -186,7 +250,7 @@ const PromptAnalysisDashboard = () => {
   const diffSummary = comparison ? getDiffSummary() : null;
   
   // Toggle expanded view function
-  const toggleExpandedView = () => {
+  const toggleExpandedView = (): void => {
     setExpandedView(!expandedView);
   };
   
@@ -389,7 +453,7 @@ const PromptAnalysisDashboard = () => {
                         {parseFloat(comparison.diffs.time.value) !== 0 && (
                           <>
                             <StatArrow type={parseFloat(comparison.diffs.time.value) < 0 ? 'decrease' : 'increase'} />
-                            {Math.abs(comparison.diffs.time.value)} ms ({comparison.diffs.time.percent}%)
+                            {Math.abs(parseFloat(comparison.diffs.time.value))} ms ({comparison.diffs.time.percent}%)
                           </>
                         )}
                       </StatHelpText>
