@@ -4,6 +4,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 const app = express();
 const VITE_PORT = 5176;
 const API_PORT = 8000;
+const API_URL = process.env.VITE_API_URL || `http://localhost:${API_PORT}`;
 
 // Add middleware to set the cookie for all responses
 app.use((req, res, next) => {
@@ -11,11 +12,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// Specific proxy for analysis endpoint
+app.use(
+  '/api/analysis',
+  createProxyMiddleware({
+    target: API_URL,
+    changeOrigin: true,
+  })
+);
+
 // Then your proxy middleware as before
 app.use(
   '/api',
   createProxyMiddleware({
-    target: `http://localhost:${API_PORT}`,
+    target: API_URL,
     changeOrigin: true,
   })
 );

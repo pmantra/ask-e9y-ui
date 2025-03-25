@@ -1,14 +1,19 @@
 import axios from 'axios';
 import config from '../config';
 
+// For Vercel deployment, use relative URLs when in production to use rewrites
+const baseURL = config.APP_ENV === 'production' 
+  ? '/api'
+  : `${config.API_URL}/api`;
+
 const api = axios.create({
-  baseURL: `${config.API_URL}/api`,
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-console.log("API URL:", config.API_URL);
+console.log("API URL:", baseURL);
 
 export interface QueryRequest {
   query: string;
