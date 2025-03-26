@@ -12,7 +12,6 @@ import {
   IconButton, 
   useDisclosure,
   Divider,
-  Badge,
   Button
 } from '@chakra-ui/react';
 import { FiStar, FiClock, FiPlay, FiChevronDown, FiChevronUp } from 'react-icons/fi';
@@ -28,17 +27,22 @@ interface SidebarProps {
 }
 
 // Business-focused example queries to demonstrate system capabilities
-const exampleQueries = [
-  // Verification queries
-  "Count all failed verification attempts in the last week",
-  
-  // Eligibility analysis
-  "List members with overeligibility and their eligible organizations",
-  "Count all verifications by organization",
-  
-  // Organization insights
-  "Compare member counts across all organizations",
-  "What files were processed in the last week? ",
+const EXAMPLE_QUERIES = [
+  {
+    category: 'Verifications',
+    queries: [
+      "Count all failed verification attempts in the last week",
+      "Count all verifications by organization"
+    ]
+  },
+  {
+    category: 'Organizations',
+    queries: [
+      "List members with overeligibility and their eligible organizations",
+      "Compare member counts across all organizations",
+      "What files were processed in the last week?"
+    ]
+  }
 ];
 
 const Sidebar = ({ 
@@ -86,68 +90,203 @@ const Sidebar = ({
   return (
     <Box 
       width="100%"
-      bg="white" 
+      bg="neutral.10" 
       borderRight="1px" 
-      borderColor="gray.200" 
-      p={4} 
+      borderColor="neutral.25" 
+      p={6} 
       height="100%" 
       overflow="auto"
       overflowX="hidden"
+      css={{
+        '&::-webkit-scrollbar': {
+          width: '8px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: 'var(--chakra-colors-neutral-20)',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: 'var(--chakra-colors-neutral-30)',
+          borderRadius: '4px',
+        },
+        '&::-webkit-scrollbar-thumb:hover': {
+          background: 'var(--chakra-colors-neutral-40)',
+        },
+      }}
     >
       <VStack align="stretch" spacing={6} width="100%">
-        <Heading size="md">Ask E9Y</Heading>
+        <Heading 
+          size="md" 
+          color="neutral.60"
+          fontFamily="sansSerif.semibold"
+        >
+          Ask E9Y
+        </Heading>
         
         {/* Example Queries Section */}
         <Box width="100%">
-          <Flex justify="space-between" align="center" mb={2} width="100%">
-            <Heading size="sm">Example Queries</Heading>
+          <Flex justify="space-between" align="center" mb={3} width="100%">
+            <Heading 
+              size="sm" 
+              color="neutral.60"
+              fontFamily="sansSerif.semibold"
+            >
+              Example Queries
+            </Heading>
             <IconButton
               size="xs"
               icon={isExamplesOpen ? <FiChevronUp /> : <FiChevronDown />}
               aria-label={isExamplesOpen ? "Collapse" : "Expand"}
               onClick={toggleExamples}
               variant="ghost"
+              color="neutral.50"
+              _hover={{ bg: 'primary.10', color: 'primary.30' }}
             />
           </Flex>
           <Collapse in={isExamplesOpen}>
-            <List spacing={1} width="100%">
-              {exampleQueries.map((query, index) => (
-                <ListItem 
-                  key={index}
-                  p={2}
-                  borderRadius="md"
-                  _hover={{ bg: "gray.100" }}
-                  cursor="pointer"
-                  onClick={() => onRunQuery && onRunQuery(query)}
-                  maxWidth="100%"
-                >
-                  <Flex align="center" width="100%">
-                    <Icon as={FiPlay} color="green.500" flexShrink={0} mr={2} />
-                    <Text fontSize="sm" noOfLines={1}>{query}</Text>
-                  </Flex>
-                </ListItem>
+            <VStack spacing={4} align="stretch">
+              {EXAMPLE_QUERIES.map((category) => (
+                <Box key={category.category}>
+                  <Text
+                    fontSize="xs"
+                    color="neutral.50"
+                    textTransform="uppercase"
+                    fontWeight="semibold"
+                    fontFamily="sansSerif.semibold"
+                    letterSpacing="0.05em"
+                    mb={2}
+                  >
+                    {category.category}
+                  </Text>
+                  <List spacing={1}>
+                    {category.queries.map((query, index) => (
+                      <ListItem 
+                        key={index}
+                        position="relative"
+                        role="button"
+                        transition="all 0.2s"
+                      >
+                        <Flex
+                          p={2}
+                          borderRadius="md"
+                          cursor="pointer"
+                          onClick={() => onRunQuery && onRunQuery(query)}
+                          position="relative"
+                          align="center"
+                          width="100%"
+                          role="group"
+                          transition="all 0.2s"
+                          _hover={{
+                            bg: '#f1f7f6',
+                            pl: 3,
+                          }}
+                        >
+                          <Box
+                            position="absolute"
+                            left="-12px"
+                            top="50%"
+                            transform="translateY(-50%)"
+                            width="2px"
+                            height="0%"
+                            bg="#00856f"
+                            transition="height 0.2s"
+                            _groupHover={{
+                              height: '70%'
+                            }}
+                          />
+                          <Box
+                            position="relative"
+                            width="24px"
+                            height="24px"
+                            mr={2}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            <Icon 
+                              as={FiPlay}
+                              color="#00856f"
+                              position="absolute"
+                              opacity={0}
+                              transform="translateX(-5px)"
+                              transition="all 0.2s"
+                              _groupHover={{
+                                opacity: 1,
+                                transform: "translateX(0)",
+                                color: '#005d4e'
+                              }}
+                            />
+                          </Box>
+                          <Box flex="1">
+                            <Text 
+                              fontSize="sm" 
+                              noOfLines={1}
+                              color="#172321"
+                              fontFamily="sansSerif.normal"
+                              transition="all 0.2s"
+                              _groupHover={{
+                                color: '#00856f'
+                              }}
+                            >
+                              {query}
+                            </Text>
+                          </Box>
+                        </Flex>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
               ))}
-            </List>
+            </VStack>
           </Collapse>
         </Box>
         
-        <Divider />
+        <Divider borderColor="neutral.25" />
         
         {/* Saved Queries Section */}
         <Box width="100%">
-          <Flex justify="space-between" align="center" mb={2} width="100%">
-            <Heading size="sm">Saved Queries</Heading>
+          <Flex justify="space-between" align="center" mb={3} width="100%">
+            <Flex align="center" gap={2}>
+              <Heading 
+                size="sm"
+                color="neutral.60"
+                fontFamily="sansSerif.semibold"
+              >
+                Saved Queries
+              </Heading>
+              {savedQueries.length > 0 && (
+                <Text
+                  fontSize="xs"
+                  color="neutral.50"
+                  bg="neutral.20"
+                  px={2}
+                  py={0.5}
+                  borderRadius="full"
+                  fontFamily="sansSerif.normal"
+                >
+                  {savedQueries.length}
+                </Text>
+              )}
+            </Flex>
             <IconButton
               size="xs"
               icon={isSavedOpen ? <FiChevronUp /> : <FiChevronDown />}
               aria-label={isSavedOpen ? "Collapse" : "Expand"}
               onClick={toggleSaved}
               variant="ghost"
+              color="neutral.50"
+              _hover={{ bg: 'primary.10', color: 'primary.30' }}
             />
           </Flex>
           <Collapse in={isSavedOpen}>
             {savedQueries.length === 0 ? (
-              <Text fontSize="sm" color="gray.500" py={2}>Save queries by clicking the bookmark icon on messages.</Text>
+              <Text 
+                fontSize="sm" 
+                color="neutral.50" 
+                py={2}
+                fontFamily="sansSerif.normal"
+              >
+                Save queries by clicking the bookmark icon on messages.
+              </Text>
             ) : (
               <>
                 <List spacing={1} width="100%">
@@ -156,25 +295,77 @@ const Sidebar = ({
                     .map(query => (
                       <ListItem 
                         key={query.id}
-                        p={2}
-                        borderRadius="md"
-                        _hover={{ bg: "gray.100" }}
-                        cursor="pointer"
-                        maxWidth="100%"
+                        position="relative"
+                        role="button"
                       >
-                        <Flex align="center" justify="space-between" width="100%">
+                        <Flex
+                          p={2}
+                          borderRadius="md"
+                          cursor="pointer"
+                          align="center"
+                          justify="space-between"
+                          width="100%"
+                          role="group"
+                          transition="all 0.2s"
+                          _hover={{
+                            bg: '#f1f7f6',
+                            pl: 3,
+                          }}
+                        >
+                          <Box
+                            position="absolute"
+                            left="-12px"
+                            top="50%"
+                            transform="translateY(-50%)"
+                            width="2px"
+                            height="0%"
+                            bg="#00856f"
+                            transition="height 0.2s"
+                            _groupHover={{
+                              height: '70%'
+                            }}
+                          />
                           <Flex align="center" flex="1" onClick={() => handleRunSavedQuery(query)} minWidth="0">
-                            <Icon as={FiStar} color="yellow.500" flexShrink={0} mr={2} />
-                            <Text fontSize="sm" noOfLines={1}>{query.name}</Text>
+                            <Icon 
+                              as={FiStar} 
+                              color="#00856f"
+                              flexShrink={0} 
+                              mr={2}
+                              transition="all 0.2s"
+                              _groupHover={{
+                                color: '#005d4e',
+                                transform: 'scale(1.1)'
+                              }}
+                            />
+                            <Text 
+                              fontSize="sm" 
+                              noOfLines={1}
+                              color="#172321"
+                              fontFamily="sansSerif.normal"
+                              transition="all 0.2s"
+                              _groupHover={{
+                                color: '#00856f'
+                              }}
+                            >
+                              {query.name}
+                            </Text>
                           </Flex>
                           <IconButton
                             size="xs"
                             icon={<FiPlay />}
                             aria-label="Run Query"
-                            colorScheme="blue"
                             variant="ghost"
+                            color="#00856f"
                             onClick={() => handleRunSavedQuery(query)}
                             flexShrink={0}
+                            opacity={0}
+                            transform="translateX(-5px)"
+                            transition="all 0.2s"
+                            _groupHover={{
+                              opacity: 1,
+                              transform: "translateX(0)",
+                              bg: '#f1f7f6'
+                            }}
                           />
                         </Flex>
                       </ListItem>
@@ -185,7 +376,10 @@ const Sidebar = ({
                     size="xs" 
                     variant="link" 
                     onClick={() => setShowAllSaved(!showAllSaved)}
-                    mt={1}
+                    mt={2}
+                    color="primary.30"
+                    fontFamily="sansSerif.normal"
+                    _hover={{ color: 'primary.40' }}
                   >
                     {showAllSaved 
                       ? "Show less" 
@@ -199,19 +393,49 @@ const Sidebar = ({
         
         {/* Recent Queries Section */}
         <Box width="100%">
-          <Flex justify="space-between" align="center" mb={2} width="100%">
-            <Heading size="sm">Recent History</Heading>
+          <Flex justify="space-between" align="center" mb={3} width="100%">
+            <Flex align="center" gap={2}>
+              <Heading 
+                size="sm"
+                color="neutral.60"
+                fontFamily="sansSerif.semibold"
+              >
+                Recent History
+              </Heading>
+              {recentQueries.length > 0 && (
+                <Text
+                  fontSize="xs"
+                  color="neutral.50"
+                  bg="neutral.20"
+                  px={2}
+                  py={0.5}
+                  borderRadius="full"
+                  fontFamily="sansSerif.normal"
+                >
+                  {recentQueries.length}
+                </Text>
+              )}
+            </Flex>
             <IconButton
               size="xs"
               icon={isRecentOpen ? <FiChevronUp /> : <FiChevronDown />}
               aria-label={isRecentOpen ? "Collapse" : "Expand"}
               onClick={toggleRecent}
               variant="ghost"
+              color="neutral.50"
+              _hover={{ bg: 'primary.10', color: 'primary.30' }}
             />
           </Flex>
           <Collapse in={isRecentOpen}>
             {recentQueries.length === 0 ? (
-              <Text fontSize="sm" color="gray.500" py={2}>Your query history will appear here.</Text>
+              <Text 
+                fontSize="sm" 
+                color="neutral.50" 
+                py={2}
+                fontFamily="sansSerif.normal"
+              >
+                Your query history will appear here.
+              </Text>
             ) : (
               <List spacing={1} width="100%">
                 {recentQueries
@@ -219,25 +443,76 @@ const Sidebar = ({
                   .map((historyItem, index) => (
                     <ListItem 
                       key={index}
-                      p={2}
-                      borderRadius="md"
-                      _hover={{ bg: "gray.100" }}
-                      cursor="pointer"
-                      maxWidth="100%"
+                      position="relative"
+                      role="button"
                     >
-                      <Flex align="center" justify="space-between" width="100%">
+                      <Flex
+                        p={2}
+                        borderRadius="md"
+                        cursor="pointer"
+                        align="center"
+                        justify="space-between"
+                        width="100%"
+                        role="group"
+                        transition="all 0.2s"
+                        _hover={{
+                          bg: '#f6f6f6',
+                          pl: 3,
+                        }}
+                      >
+                        <Box
+                          position="absolute"
+                          left="-12px"
+                          top="50%"
+                          transform="translateY(-50%)"
+                          width="2px"
+                          height="0%"
+                          bg="#64726f"
+                          transition="height 0.2s"
+                          _groupHover={{
+                            height: '70%'
+                          }}
+                        />
                         <Flex align="center" flex="1" onClick={() => handleRunRecentQuery(historyItem)} minWidth="0">
-                          <Icon as={FiClock} color="blue.500" flexShrink={0} mr={2} />
-                          <Text fontSize="sm" noOfLines={1}>{historyItem.query}</Text>
+                          <Icon 
+                            as={FiClock} 
+                            color="#64726f"
+                            flexShrink={0} 
+                            mr={2}
+                            transition="all 0.2s"
+                            _groupHover={{
+                              color: '#475467'
+                            }}
+                          />
+                          <Text 
+                            fontSize="sm" 
+                            noOfLines={1}
+                            color="#172321"
+                            fontFamily="sansSerif.normal"
+                            transition="all 0.2s"
+                            _groupHover={{
+                              color: '#64726f'
+                            }}
+                          >
+                            {historyItem.query}
+                          </Text>
                         </Flex>
                         <IconButton
                           size="xs"
                           icon={<FiPlay />}
                           aria-label="Run Query"
-                          colorScheme="blue"
                           variant="ghost"
+                          color="#64726f"
                           onClick={() => handleRunRecentQuery(historyItem)}
                           flexShrink={0}
+                          opacity={0}
+                          transform="translateX(-5px)"
+                          transition="all 0.2s"
+                          _groupHover={{
+                            opacity: 1,
+                            transform: "translateX(0)",
+                            bg: '#f6f6f6'
+                          }}
                         />
                       </Flex>
                     </ListItem>
@@ -247,7 +522,10 @@ const Sidebar = ({
                     size="xs" 
                     variant="link" 
                     onClick={() => setShowAllRecent(!showAllRecent)}
-                    mt={1}
+                    mt={2}
+                    color="primary.30"
+                    fontFamily="sansSerif.normal"
+                    _hover={{ color: 'primary.40' }}
                   >
                     {showAllRecent 
                       ? "Show less" 

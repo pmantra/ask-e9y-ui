@@ -38,7 +38,14 @@ const MainLayout = ({
 }: MainLayoutProps) => (
   <Flex h="100vh" overflow="hidden">
     {sidebarVisible && (
-      <Box width="280px" flexShrink={0} height="100%" overflowY="auto" borderRight="1px solid" borderColor="gray.200">
+      <Box 
+        width="280px" 
+        flexShrink={0} 
+        height="100%" 
+        overflowY="auto" 
+        position="relative"
+        bg="neutral.10"
+      >
         <Sidebar 
           savedQueries={savedQueries}
           recentQueries={queryHistory}

@@ -2,10 +2,8 @@ import { useState, FormEvent, useRef, useEffect } from 'react';
 import {
   Flex,
   Textarea,
-  IconButton,
   Text,
   Box,
-  useToken
 } from '@chakra-ui/react';
 import { ArrowUpIcon } from '@chakra-ui/icons';
 
@@ -16,7 +14,6 @@ interface MessageInputProps {
 
 const MessageInput = ({ onSendMessage, isDisabled }: MessageInputProps) => {
   const [message, setMessage] = useState('');
-  const [blue400] = useToken('colors', ['blue.400']); // Get blue color from theme
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   // Auto-resize textarea based on content
@@ -58,15 +55,18 @@ const MessageInput = ({ onSendMessage, isDisabled }: MessageInputProps) => {
         <Flex 
           borderWidth="1px" 
           borderRadius="full"
-          borderColor="gray.300"
+          borderColor="neutral.30"
           overflow="hidden"
-          bg="white"
+          bg="neutral.10"
           position="relative"
           align="center"
           transition="all 0.2s"
           _focusWithin={{
-            borderColor: blue400,
-            boxShadow: `0 0 0 1px ${blue400}`
+            borderColor: 'primary.30',
+            boxShadow: '0 0 0 1px var(--chakra-colors-primary-30)'
+          }}
+          _hover={{
+            borderColor: 'neutral.40'
           }}
         >
           <Textarea
@@ -78,28 +78,63 @@ const MessageInput = ({ onSendMessage, isDisabled }: MessageInputProps) => {
             border="none"
             resize="none"
             rows={1}
-            py={2}
+            py={3}
             px={4}
             _focus={{
               boxShadow: 'none'
             }}
-            minH="40px"
+            _placeholder={{
+              color: 'neutral.50'
+            }}
+            color="neutral.60"
+            fontFamily="sansSerif.normal"
+            fontSize="md"
+            minH="44px"
             maxH="150px"
             isDisabled={isDisabled}
           />
-          <IconButton
-            aria-label="Send message"
-            icon={<ArrowUpIcon />}
-            isRound
-            colorScheme="blue"
-            size="sm"
+          <Box
+            as="button"
             type="submit"
-            isDisabled={isDisabled || !message.trim()}
-            mr={1}
-          />
+            aria-label="Send message"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            width="36px"
+            height="36px"
+            borderRadius="full"
+            bg="#00856f"
+            color="white"
+            mr={2}
+            my={1}
+            cursor="pointer"
+            transition="all 0.2s"
+            _hover={{
+              bg: '#005d4e',
+              transform: 'translateY(-1px)'
+            }}
+            _active={{
+              bg: '#00413e',
+              transform: 'translateY(0)'
+            }}
+            _disabled={{
+              bg: '#99CEC5',
+              cursor: 'not-allowed',
+              _hover: { bg: '#99CEC5' }
+            }}
+            disabled={isDisabled || !message.trim()}
+          >
+            <ArrowUpIcon />
+          </Box>
         </Flex>
       </form>
-      <Text fontSize="xs" color="gray.500" mt={1} textAlign="center">
+      <Text 
+        fontSize="xs" 
+        color="neutral.50" 
+        mt={2} 
+        textAlign="center"
+        fontFamily="sansSerif.normal"
+      >
         Press Enter to send, Shift+Enter for a new line
       </Text>
     </Box>

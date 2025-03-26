@@ -1,0 +1,238 @@
+/**
+ * Maven Theme CSS Variables
+ * 
+ * This file contains CSS variables that implement the Maven design system.
+ * Import this file into your CSS to use the Maven theme.
+ */
+
+:root {
+  /* Primary colors */
+  --color-primary-10: #f1f7f6;
+  --color-primary-20: #d6ebe8;
+  --color-primary-30: #00856f;
+  --color-primary-40: #005d4e;
+  --color-primary-50: #00413e;
+  
+  /* Neutral colors */
+  --color-neutral-10: #ffffff;
+  --color-neutral-20: #f6f6f6;
+  --color-neutral-25: #e9ecec;
+  --color-neutral-30: #dee3e3;
+  --color-neutral-40: #b7c0c0;
+  --color-neutral-50: #64726f;
+  --color-neutral-60: #172321;
+  --color-neutral-70: #111111;
+  
+  /* System colors */
+  --color-system-error: #cb4c48;
+  --color-system-30: #ca4742;
+  --color-system-40: #af3631;
+  --color-system-50: #9f312d;
+  
+  /* Pink colors */
+  --color-pink-10: #fff0ee;
+  --color-pink-20: #d77979;
+  --color-pink-30: #c43c5c;
+  
+  /* Orange colors */
+  --color-orange-10: #ffefde;
+  --color-orange-20: #fcb234;
+  --color-orange-30: #d66803;
+  
+  /* Blue colors */
+  --color-blue-10: #e8f3ff;
+  --color-blue-20: #2962a5;
+  --color-blue-30: #2d2e76;
+  
+  /* Purple colors */
+  --color-purple-10: #efecff;
+  --color-purple-30: #5f39cc;
+  
+  /* Gold colors */
+  --color-gold-10: #fdf4da;
+  --color-gold-30: #be8119;
+  
+  /* Red colors */
+  --color-red-10: #fde9e9;
+  
+  /* Video colors */
+  --color-video-secondary-background: #263331;
+  --color-video-hover: #354341;
+  --color-video-pressed-state: #546360;
+  
+  /* Typography */
+  --font-family-sans-normal: 'proximanova-regular', 'Helvetiva Neue', Arial, sans-serif;
+  --font-family-sans-italic: 'proximanova-regularit', 'Helvetiva Neue', Arial, sans-serif;
+  --font-family-sans-semibold: 'proximanova-semibold', 'Helvetiva Neue', Arial, sans-serif;
+  --font-family-sans-bold: 'proximanova-bold', 'Helvetiva Neue', Arial, sans-serif;
+  
+  --font-family-serif-normal: 'domaine-display-regular', Georgia, serif;
+  --font-family-serif-medium: 'domaine-display-medium', Georgia, serif;
+  --font-family-serif-bold: 'domaine-display-extra-bold', Georgia, serif;
+  
+  /* Font sizes */
+  --font-size-xs: 0.625rem;
+  --font-size-sm: 0.75rem;
+  --font-size-md: 0.9rem;
+  --font-size-normal: 1rem;
+  --font-size-lg: 1.125rem;
+  
+  --font-size-h1: 2.5rem;
+  --font-size-h2: 2rem;
+  --font-size-h3: 1.625rem;
+  --font-size-h4: 1.375rem;
+  --font-size-h5: 1.125rem;
+  --font-size-h6: 1rem;
+  --font-size-subheader: 0.875rem;
+  --font-size-h1-mobile: 1.625rem;
+  --font-size-h2-mobile: 1.625rem;
+  
+  /* Line heights */
+  --line-height-xs: 1.15rem;
+  --line-height-sm: 1.2rem;
+  --line-height-md: 1.5rem;
+  --line-height-normal: 1.5rem;
+  --line-height-lg: 1.5rem;
+  
+  --line-height-h1: 3.25rem;
+  --line-height-h2: 2.6rem;
+  --line-height-h3: 2.1125rem;
+  --line-height-h4: 1.65rem;
+  --line-height-h5: 1.7875rem;
+  --line-height-h6: 1.3rem;
+  --line-height-subheader: 1.1375;
+  --line-height-h1-mobile: 2.1125rem;
+  --line-height-h2-mobile: 2.1125rem;
+  
+  /* Spacing */
+  --spacing-1: 0.25rem; /* 4px */
+  --spacing-2: 0.5rem; /* 8px */
+  --spacing-3: 0.75rem; /* 12px */
+  --spacing-4: 1rem; /* 16px */
+  --spacing-5: 1.25rem; /* 20px */
+  --spacing-6: 1.5rem; /* 24px */
+  --spacing-7: 1.75rem; /* 28px */
+  --spacing-8: 2rem; /* 32px */
+  --spacing-10: 2.5rem; /* 40px */
+  --spacing-11: 2.75rem; /* 44px */
+  --spacing-12: 3rem; /* 48px */
+  --spacing-14: 3.5rem; /* 56px */
+  --spacing-16: 4rem; /* 64px */
+  --spacing-20: 5rem; /* 80px */
+  --spacing-24: 6rem; /* 96px */
+  --spacing-32: 8rem; /* 128px */
+  
+  /* Breakpoints (for reference only, not used in CSS vars) */
+  --breakpoint-mobile: 320px;
+  --breakpoint-mobile-md: 375px;
+  --breakpoint-mobile-max: 539px;
+  --breakpoint-mobile-landscape: 540px;
+  --breakpoint-mobile-landscape-max: 767px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-tablet-max: 1023px;
+  --breakpoint-desktop: 1024px;
+  
+  /* Borders */
+  --radius-small: 0.25rem;
+  --radius-medium: 0.5rem;
+  --radius-large: 1.5rem;
+  
+  /* Shadows */
+  --shadow-light: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  --shadow-heavy: 0 2px 32px 0 rgba(0, 0, 0, 0.1);
+  
+  /* Other measurements */
+  --container-width: 768px;
+  --text-container-width: 496px;
+  --side-panel-width: 482px;
+  --small-card-width: 256px;
+  --header-height-mobile: 56px;
+  --header-height-mobile-landscape: 64px;
+  --header-height-tablet: 72px;
+  --header-height-desktop: 80px;
+  --footer-height-desktop: 48px;
+  --header-height-fertility-portal: 91px;
+}
+
+/* Example button using Maven theme */
+.maven-button {
+  background-color: var(--color-primary-30);
+  color: var(--color-neutral-10);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-large);
+  font-family: var(--font-family-sans-semibold);
+  font-size: var(--font-size-normal);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.maven-button:hover {
+  background-color: var(--color-primary-40);
+}
+
+.maven-button:disabled {
+  background-color: #99CEC5;
+  cursor: not-allowed;
+}
+
+/* Example typography styles */
+.maven-h1 {
+  font-family: var(--font-family-sans-semibold);
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+  color: var(--color-neutral-60);
+  margin: 1.5rem 0;
+}
+
+.maven-h2 {
+  font-family: var(--font-family-sans-semibold);
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-h2);
+  color: var(--color-neutral-60);
+  margin: 1.5rem 0;
+}
+
+.maven-h3 {
+  font-family: var(--font-family-sans-semibold);
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  color: var(--color-neutral-60);
+  margin: 1.25rem 0;
+}
+
+.maven-p {
+  font-family: var(--font-family-sans-normal);
+  font-size: var(--font-size-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-neutral-60);
+  margin: 1rem 0;
+}
+
+/* Card component example */
+.maven-card {
+  background-color: var(--color-neutral-10);
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow-medium);
+  padding: var(--spacing-4);
+}
+
+/* Responsive container example */
+.maven-container {
+  padding: var(--spacing-4);
+  max-width: var(--container-width);
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .maven-container {
+    padding: var(--spacing-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  .maven-container {
+    padding: var(--spacing-12);
+  }
+} 

@@ -16,6 +16,22 @@ const colors = {
     800: '#002952',
     900: '#001429',
   },
+  primary: {
+    10: '#e6f7f5',
+    20: '#ccefeb',
+    30: '#00856f', // Main brand color
+    40: '#006a58',
+    50: '#004f41',
+  },
+  neutral: {
+    10: '#ffffff',
+    20: '#f2f4f7',
+    25: '#e4e7ec',
+    30: '#d0d5dd',
+    40: '#98a2b3',
+    50: '#667085',
+    60: '#475467',
+  },
   // More corporate color palette
   gray: {
     50: '#f9fafb',

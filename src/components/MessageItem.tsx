@@ -30,7 +30,8 @@ import {
   ModalCloseButton,
   FormControl,
   FormLabel,
-  Input
+  Input,
+  Icon
 } from '@chakra-ui/react';
 import { 
   ChevronDownIcon, 
@@ -40,7 +41,8 @@ import {
   InfoIcon, 
   CloseIcon
 } from '@chakra-ui/icons';
-import { FiBookmark } from 'react-icons/fi';
+import { FiBookmark, FiUser, FiClock, FiZap, FiDatabase, FiHelpCircle } from 'react-icons/fi';
+import { RiRobot2Fill } from 'react-icons/ri';
 import { Message } from '../types/messageTypes';
 import { getExplanation } from '../services/api';
 import { saveQuery } from '../services/storageService';
@@ -189,8 +191,8 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
         maxW: { base: isUser ? '80%' : '85%', md: isUser ? '70%' : '75%' },
         ml: isUser ? 'auto' : '3',
         mr: isUser ? '3' : 'auto',
-        bg: isUser ? 'blue.500' : message.isError ? 'red.50' : 'gray.100',
-        color: isUser ? 'white' : message.isError ? 'red.800' : 'gray.800',
+        bg: isUser ? '#00856f' : message.isError ? 'red.50' : 'gray.100',
+        color: isUser ? '#f1f7f6' : message.isError ? 'red.800' : 'gray.800',
         borderRadius: 'lg',
         p: 3,
         boxShadow: 'sm',
@@ -203,7 +205,7 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
         width: '100%',
         bg: 'transparent',
         borderLeftWidth: '3px',
-        borderLeftColor: message.isError ? 'red.400' : 'blue.400',
+        borderLeftColor: message.isError ? 'red.400' : '#dee3e3',
         pl: 3,
         py: 2,
         mt: 2,
@@ -225,7 +227,7 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
         <Tooltip label={showExplanation ? "Hide explanation" : "View explanation"}>
           <IconButton
             aria-label={showExplanation ? "Hide explanation" : "View explanation"}
-            icon={<InfoIcon />}
+            icon={<FiHelpCircle />}
             size="sm"
             onClick={toggleExplanation}
             colorScheme="green"
@@ -245,11 +247,23 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
       <Flex justify="flex-start" width="100%" my={4}>
         <Avatar
           size="sm"
-          name="E 9 Y"
-          bg="blue.500"
-          color="white"
+          name=""
+          bg="#f1f7f6"
+          color="#00856f"
           mr={2}
           fontSize="xs"
+          fontWeight="bold"
+          letterSpacing="0.05em"
+          borderWidth="2px"
+          borderColor="#00856f"
+          icon={<RiRobot2Fill size="16px" />}
+          _hover={{
+            bg: '#d6ebe8',
+            borderColor: '#005d4e',
+            color: '#005d4e',
+            transform: 'scale(1.05)',
+            transition: 'all 0.2s'
+          }}
         />
         <Box 
           p={4} 
@@ -278,11 +292,23 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
         {!isUser && (
           <Avatar
             size="sm"
-            name="E 9 Y"
-            bg="blue.500"
-            color="white"
+            name=""
+            bg="#f6f6f6"
+            color="#64726f"
             mr={2}
             fontSize="xs"
+            fontWeight="bold"
+            letterSpacing="0.05em"
+            borderWidth="2px"
+            borderColor="#64726f"
+            icon={<RiRobot2Fill size="16px" />}
+            _hover={{
+              bg: '#e9ecec',
+              borderColor: '#172321',
+              color: '#172321',
+              transform: 'scale(1.05)',
+              transition: 'all 0.2s'
+            }}
           />
         )}
         <Text 
@@ -296,10 +322,22 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
         {isUser && (
           <Avatar
             size="sm"
-            name="User"
-            bg="gray.300"
+            name=""
+            bg="#f6f6f6"
+            color="#64726f"
             ml={2}
             fontSize="xs"
+            fontWeight="medium"
+            borderWidth="2px"
+            borderColor="#64726f"
+            icon={<FiUser size="16px" />}
+            _hover={{
+              bg: '#e9ecec',
+              borderColor: '#172321',
+              color: '#172321',
+              transform: 'scale(1.05)',
+              transition: 'all 0.2s'
+            }}
           />
         )}
       </Flex>
@@ -326,31 +364,51 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
                 <Flex 
                   justifyContent="space-between" 
                   alignItems="center" 
-                  bg="blue.50" 
+                  bg="#f1f7f6"
                   p={2} 
                   borderRadius="md"
                   borderBottomRadius={(showResults || showSql) ? 0 : 'md'}
                   borderBottom={(showResults || showSql) ? '1px solid' : 'none'}
-                  borderColor="blue.100"
+                  borderColor="#d6ebe8"
                 >
-                  <HStack>
-                    <Text fontSize="sm" fontWeight="medium">Query Results</Text>
-                    <Badge colorScheme="blue">
-                      {message.queryResults?.rowCount || (message.queryResults?.results?.length || 0)} rows
-                    </Badge>
-                    {/* Show execution time if available */}
-                    {(message.queryResults?.executionTimeMs || message.queryResults?.query_details?.execution_time_ms) && (
-                      <Badge colorScheme="green">
-                        {(message.queryResults?.executionTimeMs || 
-                          message.queryResults?.query_details?.execution_time_ms || 0).toFixed(2)}ms
+                  <HStack spacing={3}>
+                    <HStack>
+                      <Text fontSize="sm" fontWeight="medium" color="#172321">Query Results</Text>
+                      {/* Primary badge - Row count */}
+                      <Badge bg="#e8f3ff" color="#2962a5" px={2} py={1} borderRadius="full">
+                        {message.queryResults?.rowCount || (message.queryResults?.results?.length || 0)} rows
                       </Badge>
-                    )}
-                    {/* Show cache status if available */}
-                    {message.timing_stats?.cache_status && message.timing_stats.cache_status !== "miss" && (
-                      <Badge colorScheme="purple">
-                        Cached
-                      </Badge>
-                    )}
+                    </HStack>
+                    
+                    {/* Secondary information with subtle styling */}
+                    <HStack spacing={2} opacity="0.8">
+                      {/* Execution time with clock icon */}
+                      {(message.queryResults?.executionTimeMs || message.queryResults?.query_details?.execution_time_ms) && (
+                        <HStack spacing={1}>
+                          <Icon as={FiClock} color="#64726f" boxSize="12px" />
+                          <Text fontSize="xs" color="#64726f">
+                            {(message.queryResults?.executionTimeMs || 
+                              message.queryResults?.query_details?.execution_time_ms || 0).toFixed(2)}ms
+                          </Text>
+                        </HStack>
+                      )}
+                      {/* Cache status with icon and tooltip */}
+                      {message.timing_stats?.cache_status && message.timing_stats.cache_status !== "miss" && (
+                        <Tooltip label="Response cached" placement="top">
+                          <Box>
+                            <Icon 
+                              as={FiZap} 
+                              color="#d66803" 
+                              boxSize="12px"
+                              transition="all 0.2s"
+                              _hover={{
+                                transform: 'scale(1.1)'
+                              }}
+                            />
+                          </Box>
+                        </Tooltip>
+                      )}
+                    </HStack>
                   </HStack>
                   <HStack>
                     {/* Save Query Button - Only show for system messages with results */}
@@ -362,26 +420,48 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
                           size="sm"
                           onClick={onOpen}
                           variant="ghost"
-                          colorScheme="blue"
+                          color="#64726f"
+                          _hover={{
+                            bg: '#f1f7f6',
+                            color: '#00856f'
+                          }}
                         />
                       </Tooltip>
                     )}
                     
                     {/* SQL Button - Only show if SQL exists */}
                     {message.queryResults?.sql && (
-                      <Button 
-                        size="xs" 
-                        leftIcon={<CopyIcon />} 
-                        onClick={() => setShowSql(!showSql)}
-                        colorScheme="gray"
-                        variant={showSql ? "solid" : "ghost"}
-                      >
-                        {showSql ? "Hide SQL" : "SQL"}
-                      </Button>
+                      <Tooltip label={showSql ? "Hide SQL" : "View SQL"}>
+                        <Button 
+                          size="xs" 
+                          leftIcon={<FiDatabase />}
+                          onClick={() => setShowSql(!showSql)}
+                          bg={showSql ? '#5f39cc' : 'transparent'}
+                          color={showSql ? 'white' : '#64726f'}
+                          variant="ghost"
+                          _hover={{
+                            bg: showSql ? '#5B3A91' : '#efecff',
+                            color: showSql ? 'white' : '#5f39cc'
+                          }}
+                        >
+                          SQL
+                        </Button>
+                      </Tooltip>
                     )}
                     
                     {/* Explanation button/icon */}
-                    {renderExplainButton()}
+                    {explanationReady && (
+                      <Tooltip label={showExplanation ? "Hide explanation" : "View explanation"}>
+                        <IconButton
+                          aria-label={showExplanation ? "Hide explanation" : "View explanation"}
+                          icon={<FiHelpCircle />}
+                          size="sm"
+                          onClick={toggleExplanation}
+                          colorScheme="green"
+                          variant={showExplanation ? "solid" : "ghost"}
+                        />
+                      </Tooltip>
+                    )}
                     
                     <Tooltip label={showResults ? 'Hide Results' : 'Show Results'}>
                       <IconButton
@@ -390,6 +470,11 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
                         size="xs"
                         onClick={() => setShowResults(!showResults)}
                         variant="ghost"
+                        color="#64726f"
+                        _hover={{
+                          bg: '#f1f7f6',
+                          color: '#00856f'
+                        }}
                       />
                     </Tooltip>
                   </HStack>
@@ -453,7 +538,7 @@ const MessageItem = ({ message, onSaveQuery }: MessageItemProps) => {
                         borderColor="green.100"
                       >
                         <HStack>
-                          <InfoIcon color="green.500" />
+                          <FiHelpCircle color="green.500" />
                           <Text fontSize="sm" fontWeight="medium">Explanation</Text>
                         </HStack>
                         <Tooltip label="Hide Explanation">
@@ -567,16 +652,36 @@ const ResultsTable = ({ results }: { results: any[] }) => {
   
   return (
     <Table size="sm" variant="simple">
-      <Thead bg="gray.50">
+      <Thead bg="#f6f6f6">
         <Tr>
           {columns.map(column => (
-            <Th key={column} whiteSpace="nowrap">{column}</Th>
+            <Th 
+              key={column} 
+              whiteSpace="nowrap" 
+              color="#172321"
+              textTransform="uppercase" 
+              fontSize="xs" 
+              fontWeight="semibold" 
+              py={3}
+              px={4}
+              borderBottom="2px"
+              borderColor="#dee3e3"
+              letterSpacing="0.05em"
+            >
+              {column}
+            </Th>
           ))}
         </Tr>
       </Thead>
       <Tbody>
         {results.map((row, rowIndex) => (
-          <Tr key={rowIndex}>
+          <Tr 
+            key={rowIndex} 
+            _hover={{ bg: '#f1f7f6' }}
+            transition="background-color 0.2s"
+            borderBottom="1px solid"
+            borderColor="#f6f6f6"
+          >
             {columns.map(column => {
               const value = row[column];
               
@@ -604,7 +709,14 @@ const ResultsTable = ({ results }: { results: any[] }) => {
               }
               
               return (
-                <Td key={`${rowIndex}-${column}`}>
+                <Td 
+                  key={`${rowIndex}-${column}`}
+                  py={2.5}
+                  px={4}
+                  fontSize="sm"
+                  color="#172321"
+                  fontFamily="mono"
+                >
                   {displayValue}
                 </Td>
               );

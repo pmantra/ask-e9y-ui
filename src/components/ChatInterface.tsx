@@ -170,10 +170,10 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
       <Flex 
         p={3} 
         borderBottomWidth="1px" 
-        borderColor="gray.200" 
+        borderColor="#dee3e3" 
         justify="space-between" 
         align="center"
-        bg="white"
+        bg="#ffffff"
         boxShadow="sm"
       >
         <IconButton
@@ -194,8 +194,12 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
           to="/analysis"
           leftIcon={<FiBarChart2 />}
           variant="ghost"
-          colorScheme="blue"
+          color="#64726f"
           size="sm"
+          _hover={{
+            bg: '#f1f7f6',
+            color: '#00856f'
+          }}
         >
           Analysis
         </Button>
@@ -207,7 +211,7 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
         flex="1" 
         overflowY="auto" 
         py={4}
-        bg="gray.50"  // Subtle background color to distinguish from sidebar
+        bg="#f6f6f6"  // Light neutral background for main chat area
         position="relative"
       >
         <MessageList 
@@ -221,9 +225,9 @@ const ChatInterface = forwardRef(({ onToggleSidebar, onQueryRun, onSaveQuery }: 
       {/* Input Area with modern styling */}
       <Box
         borderTopWidth="1px"
-        borderColor="gray.200"
+        borderColor="#dee3e3"
         p={4}
-        bg="white"
+        bg="#ffffff"
         width="100%"
       >
         <MessageInput onSendMessage={handleSendMessage} isDisabled={isLoading} />
